@@ -1,42 +1,48 @@
 #include <Geode/Geode.hpp>
+#include <Geode/ui/GeodeUI.hpp>
 #include "ModListPopup.hpp"
-#include <Geode/modify/CCDirector.hpp>
 
 using namespace geode::prelude;
 
-class $modify(MyCCDirector, CCDirector) {
+#include <Geode/modify/CCLayer.hpp>
+class $modify(ModsLayerExt, CCLayer) {
 
-	void onModLogs(CCObject* sender) {
-		ModListPopup::create()->show();
-	}
-
-	bool replaceScene(CCScene* scene) {
-		if (!CCDirector::replaceScene(scene)) return false;
-
-		if(scene->getChildrenCount() == 0) return true;
+	void tryCustomSetup(float) {
+		if (!typeinfo_cast<CCLayer*>(this)) return;
 
 		bool geodeTheme = Loader::get()->getLoadedMod("geode.loader")->getSettingValue<bool>("enable-geode-theme");
 
-		if(CCNode* node = getChildOfType<CCNode>(scene, 0)){
-			if(node->getID() == "ModsLayer"){
-				if(CCMenu* actionsMenu = typeinfo_cast<CCMenu*>(node->getChildByID("actions-menu"))){
+		if (this->getID() == "ModsLayer") {
+			if (CCMenu* actionsMenu = typeinfo_cast<CCMenu*>(this->getChildByID("actions-menu"))) {
 
-					CCSprite* spr = CircleButtonSprite::createWithSprite(
-						"terminal.png"_spr, .85f,
-						(geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green)
-					);
-					spr->setScale(0.8f);
+				CCSprite* spr = CircleButtonSprite::createWithSprite(
+					"terminal.png"_spr, .85f,
+					(geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green)
+				);
+				spr->setScale(0.8f);
 
-					CCMenuItemSpriteExtra* logsBtn = CCMenuItemSpriteExtra::create(spr, node, menu_selector(MyCCDirector::onModLogs));
-					logsBtn->setID("mods-logs-button");
-					actionsMenu->addChild(logsBtn);
-					actionsMenu->updateLayout();
-				}
+				CCMenuItemSpriteExtra* logsBtn = CCMenuItemExt::createSpriteExtra(
+					spr, [](CCNode*) {
+						ModListPopup::create()->show();
+					}
+				);
+				logsBtn->setID("mods-logs-button");
+				actionsMenu->addChild(logsBtn);
+				actionsMenu->updateLayout();
+
 			}
 		}
-
-		return true;
 	}
+
+	$override bool init() {
+
+		this->scheduleOnce(
+			schedule_selector(ModsLayerExt::tryCustomSetup), 0.f
+		);
+
+		return CCLayer::init();
+	}
+
 };
 
 $execute {
