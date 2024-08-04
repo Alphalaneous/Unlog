@@ -1,5 +1,6 @@
 #include "ModItem.hpp"
 #include <Geode/utils/ColorProvider.hpp>
+#include <Geode/ui/GeodeUI.hpp>
 
 bool ModItem::init(Mod* mod, CCSize const& size) {
     if (!CCNode::init()) {
@@ -26,6 +27,24 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
         Anchor::Center
     );
 
+    auto logoBtn = CCMenuItemExt::createSpriteExtra(
+        geode::createModLogo(mod)->getChildByID("sprite"), [mod](CCNode*) {
+            geode::openInfoPopup(mod);
+        }
+    );
+
+    logoBtn->m_baseScale = (0.38f);
+    logoBtn->setScale(logoBtn->m_baseScale);
+    logoBtn->m_animationEnabled = false;
+    logoBtn->m_colorEnabled = true;
+    logoBtn->setAnchorPoint({ 0.0f, 0.5f });
+
+    this->addChildAtPosition(
+        CCMenu::createWithItem(logoBtn),
+        Anchor::Left,
+        { 4, 0 }
+    );
+
     auto nameLabel = CCLabelBMFont::create(
         mod->getName().c_str(),
         "bigFont.fnt"
@@ -37,16 +56,20 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
     
     m_toggle->toggle(mod->isLoggingEnabled());
 
-    constexpr float paddings = 30.0f;
-    float calc = size.width - paddings;
-    nameLabel->setWidth(calc);
     nameLabel->setScale(0.4f);
-    nameLabel->setAnchorPoint({0.0f, 0.5f});
+    nameLabel->setAnchorPoint({ 0.0f, 0.5f });
+
+    constexpr float padding_left = 60.000f;
+
+    float calc = size.width - padding_left;
+    if (nameLabel->getScaledContentWidth() >= calc) {
+        nameLabel->setScale(calc / nameLabel->getContentWidth());
+    }
 
     this->addChildAtPosition(
         nameLabel,
         Anchor::Left,
-        {5, 4}
+        { 26, 4 }
     );
 
     auto idLabel = CCLabelBMFont::create(
@@ -61,16 +84,16 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
     this->addChildAtPosition(
         idLabel,
         Anchor::Left,
-        {5, -6}
+        { 26, -6 }
     );
 
     auto menu = CCMenu::create();
     menu->setAnchorPoint({1.0f, 0.5f});
-    menu->setContentSize({size.width/2, size.height});
+    menu->setContentSize({ padding_left, size.height});
     menu->addChildAtPosition(
         m_toggle,
         Anchor::Right,
-        {0, 0}
+        { 0, 0 }
     );
 
     auto layout = RowLayout::create();
@@ -82,7 +105,7 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
     this->addChildAtPosition(
         menu,
         Anchor::Right,
-        {-3, 0}
+        { -3, 0 }
     );
 
     return true;
