@@ -38,8 +38,14 @@ class $modify(ModsLayerExt, CCLayer) {
 };
 
 $on_mod(Loaded) {
+	Mod* unlog = Mod::get();
+	auto& saveContainer = unlog->getSaveContainer();
 	for(Mod* mod : Loader::get()->getAllMods()){
-		auto value = Mod::get()->getSavedValue<bool>(mod->getID(), true);
-		mod->setLoggingEnabled(value);
+		auto id = mod->getID();
+		if (saveContainer.contains(id) && !saveContainer[id].asBool().unwrapOr(true)) {
+			saveContainer[id] = 4;
+		}
+
+		mod->setLogLevel(Severity::cast(std::clamp(unlog->getSavedValue<int>(id, 0), 0, 4)));
 	}
 }

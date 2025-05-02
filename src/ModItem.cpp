@@ -2,6 +2,14 @@
 #include <Geode/utils/ColorProvider.hpp>
 #include <Geode/ui/GeodeUI.hpp>
 
+constexpr std::array frames = {
+    "GJ_completesIcon_001.png",
+    "GJ_infoIcon_001.png",
+    "geode.loader/info-warning.png",
+    "geode.loader/info-alert.png",
+    "GJ_deleteIcon_001.png"
+};
+
 bool ModItem::init(Mod* mod, CCSize const& size) {
     if (!CCNode::init()) {
         return false;
@@ -50,11 +58,13 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
         "bigFont.fnt"
     );
 
-    m_toggle = CCMenuItemToggler::createWithStandardSprites(
-        this, menu_selector(ModItem::onToggle), .6f
-    );
-    
-    m_toggle->toggle(mod->isLoggingEnabled());
+    auto logLevel = mod->getLogLevel();
+
+    auto toggleSprite = CCSprite::createWithSpriteFrameName(frames[logLevel]);
+    toggleSprite->setScale(0.9f);
+
+    m_toggle = CCMenuItemSpriteExtra::create(toggleSprite, this, menu_selector(ModItem::onToggle));
+    m_toggle->setTag(logLevel);
 
     nameLabel->setScale(0.4f);
     nameLabel->setAnchorPoint({ 0.0f, 0.5f });
@@ -112,8 +122,15 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
 }
 
 void ModItem::onToggle(CCObject* sender){
-    m_mod->setLoggingEnabled(!m_toggle->isToggled());
-    Mod::get()->setSavedValue<bool>(m_mod->getID(), !m_toggle->isToggled());
+    auto tag = sender->getTag();
+    tag = tag == 4 ? 0 : tag + 1;
+    sender->setTag(tag);
+
+    static_cast<CCSprite*>(m_toggle->getNormalImage())->setDisplayFrame(CCSpriteFrameCache::get()->spriteFrameByName(frames[tag]));
+    m_toggle->updateSprite();
+
+    m_mod->setLogLevel(Severity::cast(tag));
+    Mod::get()->setSavedValue<int>(m_mod->getID(), tag);
 }
 
 ModItem* ModItem::create(Mod* mod, CCSize const& size) {
