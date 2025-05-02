@@ -1,3 +1,6 @@
+# 1.1.6
+- Fixes a crash
+
 # 1.1.5
 - Add tags
 

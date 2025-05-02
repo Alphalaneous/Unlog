@@ -28,7 +28,7 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
     );
 
     auto logoBtn = CCMenuItemExt::createSpriteExtra(
-        geode::createModLogo(mod)->getChildByID("sprite"), [mod](CCNode*) {
+        geode::createModLogo(mod), [mod](CCNode*) {
             geode::openInfoPopup(mod);
         }
     );
