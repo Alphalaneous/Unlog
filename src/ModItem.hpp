@@ -13,5 +13,6 @@ public:
     static ModItem* create(Mod* mod, CCSize const& size);
 private:
     bool init(Mod* mod, CCSize const& size);
+    void onModButton(CCObject* sender);
     void onToggle(CCObject* sender);
 };

@@ -1,5 +1,7 @@
 # 1.1.6
 - Fixes a crash
+- Log Level Support (Thanks hiimjasmine00)
+- iOS Support (Thanks hiimjasmine00)
 
 # 1.1.5
 - Add tags

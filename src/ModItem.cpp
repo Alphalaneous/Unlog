@@ -35,22 +35,16 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
         Anchor::Center
     );
 
-    auto logoBtn = CCMenuItemExt::createSpriteExtra(
-        geode::createModLogo(mod), [mod](CCNode*) {
-            geode::openInfoPopup(mod);
-        }
-    );
+    auto modLogo = geode::createModLogo(mod);
+    auto modBtn = CCMenuItemSpriteExtra::create(modLogo, this, menu_selector(ModItem::onModButton));
 
-    logoBtn->m_baseScale = (0.38f);
-    logoBtn->setScale(logoBtn->m_baseScale);
-    logoBtn->m_animationEnabled = false;
-    logoBtn->m_colorEnabled = true;
-    logoBtn->setAnchorPoint({ 0.0f, 0.5f });
+    modBtn->m_baseScale = (0.38f);
+    modBtn->setScale(modBtn->m_baseScale);
 
     this->addChildAtPosition(
-        CCMenu::createWithItem(logoBtn),
+        CCMenu::createWithItem(modBtn),
         Anchor::Left,
-        { 4, 0 }
+        { 4 + modBtn->getScaledContentSize().width/2, 0 }
     );
 
     auto nameLabel = CCLabelBMFont::create(
@@ -115,10 +109,14 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
     this->addChildAtPosition(
         menu,
         Anchor::Right,
-        { -3, 0 }
+        { -6, 0 }
     );
 
     return true;
+}
+
+void ModItem::onModButton(CCObject* sender) {
+    geode::openInfoPopup(m_mod);
 }
 
 void ModItem::onToggle(CCObject* sender){
