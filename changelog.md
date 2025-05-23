@@ -1,3 +1,6 @@
+# 1.1.7
+- Better hooking
+
 # 1.1.6
 - Fixes a crash
 - Log Level Support (Thanks hiimjasmine00)
