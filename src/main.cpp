@@ -5,8 +5,6 @@
 
 using namespace geode::prelude;
 
-#include <Geode/modify/CCLayer.hpp>
-
 class $nodeModify(ModsLayerExt, ModsLayer) {	
     void modify() {
 		bool geodeTheme = Loader::get()->getLoadedMod("geode.loader")->getSettingValue<bool>("enable-geode-theme");
